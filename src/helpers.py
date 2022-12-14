@@ -1,3 +1,5 @@
+import datetime
+
 malla_curricular = [
     "Algebra I", "Calculo I", "Introduccion a la programacion", "Metodologia de la investigacion", "Fisica General",
     "Ingles I", "Algebra II",
@@ -33,5 +35,6 @@ def siguiente_semestre(semestre):
     semestre = f"{mes}/{anio}"
 
 
-
-
+def convertir(n):
+    time_format = str(datetime.timedelta(minutes = n))
+    return time_format

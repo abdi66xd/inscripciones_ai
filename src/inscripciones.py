@@ -1,12 +1,13 @@
 import random
 import time
 
+from datetime import datetime, timedelta
+
 from osbrain import run_agent
 from osbrain import run_nameserver
 
 from src.colors import bcolors
-from src.helpers import siguiente_semestre
-
+from src.helpers import siguiente_semestre, convertir
 
 materiasRecibidas = [
     "Algebra I", "Calculo I", "Introduccion a la programacion", "Metodologia de la investigacion", "Fisica General",
@@ -24,13 +25,23 @@ materiasRecibidas = [
 def log_message(agent, message):
     agent.log_info('Recibido: %s' % message)
 
+hora_actual = datetime.strptime("08:30", "%H:%M")
+def aumentar_tiempo(minutos):
+    # Obtener la hora actual
+
+    # Añadir la cantidad de minutos a la hora actual
+    hora_nueva = hora_actual + timedelta(minutes=minutos)
+    # Devolver la hora en formato "HH:MM"
+    return hora_nueva.strftime("%H:%M")
+
 
 nombre_cajero = "Cajero1"
 nombre_director = "Director1"
 semestre = "1/2022"
 estudiantes = []
 nombre_estudiante = "Estudiante1"
-nombre_estudiante = nombre_estudiante.replace(nombre_estudiante[len(nombre_estudiante) - 1:], str(random.randint(1, 10)))
+nombre_estudiante = nombre_estudiante.replace(nombre_estudiante[len(nombre_estudiante) - 1:],
+                                              str(random.randint(1, 10)))
 cantidad_aleatoria = random.randint(1, 6)
 materias_deseadas = random.sample(materiasRecibidas, cantidad_aleatoria)
 cod_sys = "2018" + str(random.randint(10000, 99999))
@@ -39,6 +50,8 @@ nombre_cajero = nombre_cajero.replace(nombre_cajero[len(nombre_cajero) - 1:], st
 # Director
 nombre_director = nombre_director.replace(nombre_director[len(nombre_director) - 1:], str(random.randint(1, 10)))
 semestre = siguiente_semestre(semestre)
+tiempo_habilitacion_materias = random.randint(60, 120)
+
 
 materiasHabilitadasArr = [
     "Algebra I", "Calculo I", "Introduccion a la programacion", "Metodologia de la investigacion", "Fisica General",
@@ -90,6 +103,7 @@ if __name__ == '__main__':
     print(bcolors.HEADER + "  (ESTUDIANTE)  Hola cajero! quiero comprar una boleta de inscripcion" + bcolors.ENDC)
     time.sleep(1)
     print(bcolors.OKCYAN + '  (CAJERO)  Hola estudiante, son ' + str(cajero.get_attr("monto")) + bcolors.ENDC)
+    tiempo_compra = random.randint(10, 15)
     if cajero.get_attr("monto") <= estudiante.get_attr("billetera"):
         monto_restante = abs(estudiante.get_attr("billetera") - cajero.get_attr("monto"))
         estudiante.set_attr(billetera=monto_restante, boleta=True)
@@ -97,6 +111,7 @@ if __name__ == '__main__':
         print(bcolors.OKBLUE + "  ----SISTEMA----   el estudiante no tiene dinero:" + bcolors.ENDC)
     print(bcolors.OKBLUE + "   ----SISTEMA----   el estudiante tiene en la billetera: " + str(
         estudiante.get_attr("billetera")) + bcolors.ENDC)
+    aumentar_tiempo(tiempo_compra)
 
     time.sleep(1)
 
@@ -112,6 +127,8 @@ if __name__ == '__main__':
     time.sleep(1)
     print(bcolors.WARNING + '  (DIRECTOR)  Hola estudiante necesito tu codigo Sis y tu boleta' + bcolors.ENDC)
     time.sleep(1)
+    tiempo_inscripcion = random.randint(5, 15)
+    aumentar_tiempo(tiempo_inscripcion)
     if estudiante.get_attr("boleta"):
         print(bcolors.HEADER + '  (ESTUDIANTE)  Mi codigo Sys es: ' + str(
             estudiante.get_attr("codSys")) + ' y tengo el recibo de mi boleta aqui' + bcolors.ENDC)
@@ -142,4 +159,12 @@ if __name__ == '__main__':
         print(bcolors.WARNING + '  (DIRECTOR)  Debes pasar por caja y comprar una boleta.' + bcolors.ENDC)
 
     print(bcolors.OKBLUE + '(------SISTEMA------) Fin Iteracion.' + bcolors.ENDC)
+
+    tiempo_acumulado = tiempo_compra + tiempo_inscripcion + tiempo_habilitacion_materias
+    tiempo_con_formato = convertir(tiempo_acumulado)
+    print(bcolors.OKBLUE + '(------SISTEMA------) El proceso de inscripcion duro: '+str(tiempo_con_formato)+ bcolors.ENDC)
+    print(" - "+str(convertir(tiempo_habilitacion_materias))+" Durante el la habililtacion de materias")
+    print(" - "+str(convertir(tiempo_compra))+" Durante el tiempo de compra")
+    print(" - "+str(convertir(tiempo_inscripcion))+" Durante el tiempo de inscripcion")
+
     # ns.shutdown()
