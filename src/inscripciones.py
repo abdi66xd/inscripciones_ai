@@ -90,7 +90,8 @@ if __name__ == '__main__':
     if cajero.get_attr("monto") <= estudiante.get_attr("billetera"):
         monto_restante = abs(estudiante.get_attr("billetera") - cajero.get_attr("monto"))
         estudiante.set_attr(billetera=monto_restante, boleta=True)
-
+        print(bcolors.OKBLUE + "   ----SISTEMA----   El cajero cobro al estudiante y ahora tiene en la billetera: " + str(
+            estudiante.get_attr("billetera")) + bcolors.ENDC)
         time.sleep(1)
 
         # El director y el estudiante realizan una conexion para el paso de mensajes
@@ -148,10 +149,9 @@ if __name__ == '__main__':
     else:
         print(
             bcolors.OKCYAN + '  (CAJERO)  No puedes inscribirte por que no tienes el dinero suficiente' + bcolors.ENDC)
-        print(bcolors.OKBLUE + "   ----SISTEMA----   el estudiante tiene en la billetera: " + str(
-            estudiante.get_attr("billetera")) + bcolors.ENDC)
-    aumentar_tiempo(tiempo_compra)
 
+
+    aumentar_tiempo(tiempo_compra)
     tiempo_acumulado = tiempo_compra + tiempo_inscripcion + tiempo_habilitacion_materias
     tiempo_con_formato = convertir(tiempo_acumulado)
     print(bcolors.OKBLUE + '(------SISTEMA------) El proceso de inscripcion duro un total de: ' + str(
