@@ -7,25 +7,20 @@ from osbrain import run_agent
 from osbrain import run_nameserver
 
 from src.colors import bcolors
-from src.helpers import siguiente_semestre, convertir
+from src.helpers import siguiente_semestre, convertir, malla_curricular
 
-materiasRecibidas = [
-    "Algebra I", "Calculo I", "Introduccion a la programacion", "Metodologia de la investigacion", "Fisica General",
-    "Ingles", "Algebra II",
-    "Calculo II", "Matematica discreta", "Elementos de programacion y estrucutura de datos",
-    "Arquitectura de computadoras", "Estadistica I",
-    "Ecuaciones diferenciales", "Calculo numerico", "Metodos  tecnicas de programacion", "Base de datos I",
-    "Circuitos electronicos",
-    "Estadistica II", "Investigacion operativa I", "Contabilidad Basica", "Sistemas de Informacion I",
-    "Base de datos II",
-    "Taller de sistemas operativos", "Mercadotecnia", "Investigacion operativa II"
-]
+cantidad_aleatoria_materias_semestre = random.randint(30, 55)
+materiasHabilitadasArr = random.sample(malla_curricular, cantidad_aleatoria_materias_semestre)
+materiasRecibidas = materiasHabilitadasArr
 
 
 def log_message(agent, message):
     agent.log_info('Recibido: %s' % message)
 
+
 hora_actual = datetime.strptime("08:30", "%H:%M")
+
+
 def aumentar_tiempo(minutos):
     # Obtener la hora actual
 
@@ -38,12 +33,13 @@ def aumentar_tiempo(minutos):
 nombre_cajero = "Cajero1"
 nombre_director = "Director1"
 semestre = "1/2022"
-estudiantes = []
+estudiante_arr = []
 nombre_estudiante = "Estudiante1"
 nombre_estudiante = nombre_estudiante.replace(nombre_estudiante[len(nombre_estudiante) - 1:],
                                               str(random.randint(1, 10)))
-cantidad_aleatoria = random.randint(1, 6)
-materias_deseadas = random.sample(materiasRecibidas, cantidad_aleatoria)
+cantidad_aleatoria_materias = abs(random.randint(1, 6))
+materias_deseadas = random.sample(materiasHabilitadasArr, cantidad_aleatoria_materias)
+
 cod_sys = "2018" + str(random.randint(10000, 99999))
 # Cajero
 nombre_cajero = nombre_cajero.replace(nombre_cajero[len(nombre_cajero) - 1:], str(random.randint(1, 10)))
@@ -52,19 +48,8 @@ nombre_director = nombre_director.replace(nombre_director[len(nombre_director) -
 semestre = siguiente_semestre(semestre)
 tiempo_habilitacion_materias = random.randint(60, 120)
 billeteraRand = random.randint(10, 100)
-tiempo_compra=0
-tiempo_inscripcion=0
-materiasHabilitadasArr = [
-    "Algebra I", "Calculo I", "Introduccion a la programacion", "Metodologia de la investigacion", "Fisica General",
-    "Ingles", "Algebra II",
-    "Calculo II", "Matematica discreta", "Elementos de programacion y estrucutura de datos",
-    "Arquitectura de computadoras", "Estadistica I",
-    "Ecuaciones diferenciales", "Calculo numerico", "Metodos  tecnicas de programacion", "Base de datos I",
-    "Circuitos electronicos",
-    "Estadistica II", "Investigacion operativa I", "Contabilidad Basica", "Sistemas de Informacion I",
-    "Base de datos II",
-    "Taller de sistemas operativos", "Mercadotecnia", "Investigacion operativa II"
-]
+tiempo_compra = 0
+tiempo_inscripcion = 0
 
 if __name__ == '__main__':
 
@@ -81,13 +66,11 @@ if __name__ == '__main__':
         "monto": 14
     })
     director = run_agent(bcolors.FAIL + nombre_director + bcolors.ENDC, attributes={
-        "materiasRecibidas": materiasRecibidas,
+        "materiasRecibidas": materiasHabilitadasArr,
         "semestre": semestre,
-        "estudiantes": estudiantes
+        "estudiantes": estudiante_arr
     })
-    responsable = run_agent(bcolors.HEADER + 'ResponsableA' + bcolors.ENDC, attributes={
-        "materiasHabilitadas": materiasHabilitadasArr
-    })
+    responsable = run_agent(bcolors.HEADER + 'ResponsableA' + bcolors.ENDC)
 
     # Configuracion de direcciones de los agentes
     dirEst = estudiante.bind('PUSH', alias='main')
@@ -133,19 +116,27 @@ if __name__ == '__main__':
             if len(materiasTomadas) >= 1:
                 # El director inscribe a los estudiantes
                 time.sleep(1)
-                todos_los_estudiantes = director.get_attr("estudiantes")
-                todos_los_estudiantes.append({
+                estudiante_data = director.get_attr("estudiantes")
+                estudiante_data.append({
                     "codSys": estudiante.get_attr("codSys"),
                     "boleta": estudiante.get_attr("boleta"),
                     "materiasInscritas": materiasTomadas
 
                 }, )
-                director.set_attr(estudiantes=todos_los_estudiantes)
+                director.set_attr(estudiantes=estudiante_data)
                 print(bcolors.WARNING + '  (DIRECTOR)  Te inscribi con exito en tus materias!!' + bcolors.ENDC)
-                materiasUltimoEstudiante = todos_los_estudiantes[len(todos_los_estudiantes) - 1]
+                estudiante_inscrito = estudiante_data[len(estudiante_data) - 1]
                 print(bcolors.OKBLUE + "(------SISTEMA------)  El director inscribio al estudiante en las siguientes "
                                        "materias: " + bcolors.ENDC
-                      , *materiasUltimoEstudiante["materiasInscritas"], sep='      \n- ')
+                      , *estudiante_inscrito["materiasInscritas"], sep='      \n- ')
+                materias_no_tomadas = difference = set(estudiante.get_attr("materiasDeseadas")).difference(
+                    set(estudiante_inscrito["materiasInscritas"]))
+                if len(materias_no_tomadas) != 0:
+                    print(
+                        bcolors.OKBLUE + "(------SISTEMA------)  El director no pudo inscribir al estudiante en estas materias: "
+                                         "materias: " + bcolors.ENDC
+                        , *materias_no_tomadas, sep='      \n- ')
+
             else:
                 time.sleep(1)
                 print(
@@ -156,17 +147,18 @@ if __name__ == '__main__':
 
         print(bcolors.OKBLUE + '(------SISTEMA------) Fin Iteracion.' + bcolors.ENDC)
     else:
-        print(bcolors.OKCYAN + '  (CAJERO)  No puedes inscribirte por que no tienes el dinero suficiente'+ bcolors.ENDC)
-    print(bcolors.OKBLUE + "   ----SISTEMA----   el estudiante tiene en la billetera: " + str(
-        estudiante.get_attr("billetera")) + bcolors.ENDC)
+        print(
+            bcolors.OKCYAN + '  (CAJERO)  No puedes inscribirte por que no tienes el dinero suficiente' + bcolors.ENDC)
+        print(bcolors.OKBLUE + "   ----SISTEMA----   el estudiante tiene en la billetera: " + str(
+            estudiante.get_attr("billetera")) + bcolors.ENDC)
     aumentar_tiempo(tiempo_compra)
-
 
     tiempo_acumulado = tiempo_compra + tiempo_inscripcion + tiempo_habilitacion_materias
     tiempo_con_formato = convertir(tiempo_acumulado)
-    print(bcolors.OKBLUE + '(------SISTEMA------) El proceso de inscripcion duro un total de: '+str(tiempo_con_formato)+ bcolors.ENDC)
-    print(" - "+str(convertir(tiempo_habilitacion_materias))+" Durante el la habililtacion de materias")
-    print(" - "+str(convertir(tiempo_compra))+" Durante el tiempo de compra")
-    print(" - "+str(convertir(tiempo_inscripcion))+" Durante el tiempo de inscripcion")
+    print(bcolors.OKBLUE + '(------SISTEMA------) El proceso de inscripcion duro un total de: ' + str(
+        tiempo_con_formato) + bcolors.ENDC)
+    print(" - " + str(convertir(tiempo_habilitacion_materias)) + " Durante el la habililtacion de materias")
+    print(" - " + str(convertir(tiempo_compra)) + " Durante el tiempo de compra")
+    print(" - " + str(convertir(tiempo_inscripcion)) + " Durante el tiempo de inscripcion")
 
     # ns.shutdown()

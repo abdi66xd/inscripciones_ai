@@ -16,11 +16,10 @@ malla_curricular = [
     "Taller de ingenieria de software", "Gestion de calidad de software", "Redes avanzadas de computadoras",
     "Gestion estrategica de empresas", "Taller de modelacion y simulacion de sistemas", "Topicos selectos II",
     "Metodologia y planificacion de proyecto de grado", "Evaluacion y auditoria de sistemas", "Seguridad de sistemas",
-    "Topicos selectos III", "Topicos selectos IV", "Practica empresarial", "Proyecto final", "Topicos selectos V",
-    "Topicos selectos VI"
+    "Topicos selectos III", "Topicos selectos IV", "Practica empresarial", "Topicos selectos V",
+    "Topicos selectos VI" ,"Topicos selectos VII",
     "Ingles II", "Ingles III"
 ]
-
 
 def siguiente_semestre(semestre):
     mes, anio = semestre.split("/")
