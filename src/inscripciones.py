@@ -11,7 +11,6 @@ from src.helpers import siguiente_semestre, convertir, malla_curricular
 
 cantidad_aleatoria_materias_semestre = random.randint(30, 55)
 materiasHabilitadasArr = random.sample(malla_curricular, cantidad_aleatoria_materias_semestre)
-materiasRecibidas = materiasHabilitadasArr
 
 
 def log_message(agent, message):
